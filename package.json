@@ -1,0 +1,15 @@
+{
+  "name": "pyramid-builder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "pyramid-builder.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "keywords": [],
+  "author": "Martin Ždila",
+  "license": "ISC",
+  "dependencies": {
+    "sharp": "^0.28.2"
+  }
+}
