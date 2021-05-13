@@ -39,16 +39,7 @@ async function generateZoom(sourceZoom) {
     const x = Number(file);
 
     for (const file1 of await fs.readdir(name)) {
-      // const name1 = path.join(name, file1);
-
       const y = Number(file1.slice(0, -4));
-
-      // if (y > 300000) {
-      //   // console.log("mv", name1, `${name}/${y}.jpg`);
-      //   await Deno.rename(name1, `${name}/${524287 - y}.jpg`);
-      // } else {
-      //   console.log("???", y);
-      // }
 
       coords.add(`${Math.floor(x / 2)}/${Math.floor(y / 2)}`);
     }
