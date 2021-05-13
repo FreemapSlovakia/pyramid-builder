@@ -122,7 +122,7 @@ async function generateZoom(sourceZoom) {
           throw err;
         }
 
-        stitch(true);
+        await stitch(true);
       }
     }
 
