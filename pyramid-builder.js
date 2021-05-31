@@ -6,17 +6,15 @@ const maxParallel = 24;
 
 const ext = "jpg";
 
-const baseDir = "/media/martin/OSM/orto/ofmozaika2/";
+const baseDir = "/media/martin/OSM/sh/";
 
 const quality = 90;
 
 const minZoom = 0;
 
-const maxZoom = 19;
+const maxZoom = 17;
 
 // } CONFIG
-
-const { spawn } = require("child_process");
 
 const { promises: fs } = require("fs");
 
@@ -92,7 +90,7 @@ async function generateZoom(sourceZoom) {
             width: 512,
             height: 512,
             channels: 3,
-            background: { r: 255, g: 255, b: 255 },
+            background: { r: 0, g: 0, b: 0 },
           },
         })
           .composite(
