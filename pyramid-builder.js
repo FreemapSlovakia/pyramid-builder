@@ -1,3 +1,4 @@
+// ls -1 | parallel mogrify -format jpg -quality 90 {}/*.png "&&" rm {}/*.png
 // NOTE set UV_THREADPOOL_SIZE env variable to higher value (eg. 50)
 
 // CONFIG {
@@ -6,13 +7,13 @@ const maxParallel = 24;
 
 const ext = "jpg";
 
-const baseDir = "/media/martin/OSM/sh/";
+const baseDir = "/home/martin/OSM/sh/";
 
 const quality = 90;
 
 const minZoom = 0;
 
-const maxZoom = 17;
+const maxZoom = 19;
 
 // } CONFIG
 
@@ -48,7 +49,7 @@ async function generateZoom(sourceZoom) {
   let promises = [];
 
   for (const coord of [...coords].sort()) {
-    console.log(coord);
+    console.log(sourceZoom + "/" + coord);
 
     const [x, y] = coord.split("/");
 
@@ -64,11 +65,25 @@ async function generateZoom(sourceZoom) {
     ];
 
     async function stitch(check) {
-      try {
-        await fs.stat(`${baseLow}/${x}/${y}.${ext}`);
+      chk: try {
+        const s = await fs.stat(`${baseLow}/${x}/${y}.${ext}`);
+
+        for (let i = 0; i < 4; i++) {
+          try {
+            const s1 = await fs.stat(parts[i]);
+
+            if (s1.mtime > s.mtime) {
+              break chk;
+            }
+          } catch {
+            // ignore
+          }
+        }
+
+        s.mtime
 
         return;
-      } catch (err) {
+      } catch {
         // ignore
       }
 
@@ -78,11 +93,15 @@ async function generateZoom(sourceZoom) {
         for (let i = 0; i < 4; i++) {
           try {
             await fs.stat(parts[i]);
-          } catch (err) {
+          } catch {
             parts[i] = null;
           }
         }
       }
+
+      const files = ["northwest", "southwest", "northeast", "southeast"]
+        .map((gravity, i) => ({ input: parts[i], gravity }))
+        .filter((a) => a.input);
 
       try {
         const buff = await sharp({
@@ -90,14 +109,10 @@ async function generateZoom(sourceZoom) {
             width: 512,
             height: 512,
             channels: 3,
-            background: { r: 0, g: 0, b: 0 },
+            background: { r: 255, g: 255, b: 255 },
           },
         })
-          .composite(
-            ["northwest", "southwest", "northeast", "southeast"]
-              .map((gravity, i) => ({ input: parts[i], gravity }))
-              .filter((a) => a.input)
-          )
+          .composite(files)
           .png({ compressionLevel: 0 })
           .toBuffer();
 
@@ -108,6 +123,10 @@ async function generateZoom(sourceZoom) {
           .toFile(`${baseLow}/${x}/${y}.${ext}`);
       } catch (err) {
         if (check) {
+          console.log("Files", files);
+
+          console.log(err);
+
           throw err;
         }
 
