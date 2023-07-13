@@ -49,7 +49,7 @@ async function generateZoom(sourceZoom) {
   let promises = [];
 
   for (const coord of [...coords].sort()) {
-    console.log(sourceZoom + "/" + coord);
+    console.log((sourceZoom - 1) + "/" + coord);
 
     const [x, y] = coord.split("/");
 
